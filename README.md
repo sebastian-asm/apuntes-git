@@ -4,13 +4,19 @@ Simulador: [https://git-school.github.io/visualizing-git/](https://git-school.gi
 
 En GIT las carpetas de proyectos son conocidos como _repositorios_.
 
+_HEAD_ será un puntero que nos indicará en que punto del historial nos encontramos.
+
 Un _branch_ (rama) es una línea de tiempo de commits.
 
 En un _merge_ (fusión) de ramas pueden ocurrir los siguientes panoramas:
 
 1. **Fast-forward**: se dispara cuando GIT detecta que no hay ningún cambio en la rama principal, y los nuevos cambios se pueden fusionar sin conflictos.
 2. **Uniones automáticas**: cuando GIT detecta que en la rama principal hubo algún cambio y que las ramas secundarias desconocen, pero cuando se intenta hacer la fusión, GIT lo hace automaticamente sin problemas (cuando no existe conflicto, o sea, no se modificaron las mismas líneas de código).
-3. **Manual**: es cuando GIT no puede hacer la fusión de forma automática debido a que se tocaron las mismas líneas, cuando esto se soluciona se crea un nuevo commit llamado "merge commit", despúes de esto se puede seguir trabajando sin problemas. En VSCode de forma interactiva nos preguntará que queremos hacer ante un conflicto: aceptar los cambios actuales, los cambios entrantes o ambos.
+3. **Manual**: es cuando GIT no puede hacer la fusión de forma automática debido a que se tocaron las mismas líneas, cuando esto se soluciona se crea un nuevo commit llamado "merge commit", despúes de esto se puede seguir trabajando sin problemas. En VSCode de forma interactiva nos preguntará que queremos hacer ante un conflicto:
+
+   - _Aceptar el cambio actual_: mantendrá mi código tal cual e ignorará los que vienen
+   - _Aceptar el cambio entrante_: ignorará mis cambios y aceptará los que vienen
+   - _Aceptar ambos cambios_
 
 Las _tags_ (etiquetas) son una referencia a un commit específico (haciendo referencia a todo el estado del repositorio en ese momento del tiempo), utilizados principalmente para marcar versiones o release del código.
 
@@ -22,14 +28,16 @@ Los _stash_ son como unas cajas que nos permiten guardar todos los cambios tempo
 
 Un _rebase_ nos serviría para las siguientes situaciones: ordenar, corregir mensajes, unir y separa commits. Se recomienda usar el rebase en forma local para evitar conflictos en caso que el repositorio este siendo compartido.
 
+Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en algún momento de la línea de tiempo, luego se puede volver a hacer un merge pero antes se realiza un análisis de lo que se quiere fusionar.
+
 ## Comandos
 
 ### Configuración
 
 - `git config`: agregar configuraciones a GIT
 
-  - --global user.email: configurar un email a nivel global
-  - --global user.name: configurar un nombre a nivel global
+  - --global user.email {email}: configurar un email a nivel global
+  - --global user.name {usuario}: configurar un nombre a nivel global
   - --global init.defaultBranch {nombre}: establecer el nombre de la rama principal
   - --global alias.{nombre} "{comando} {banderas}": crear alias abrevido de algún comando
   - --global -e: ver la configuración global en el editor
@@ -130,7 +138,7 @@ Un _rebase_ nos serviría para las siguientes situaciones: ordenar, corregir men
 - `git branch`: listar ramas
 
   - {rama}: crea una nueva rama
-  - -m {rama} {nuevo_nombre} | -m {nuevo_nombre}: modificar el nombre de una rama
+  - -m {rama} {nuevo_nombre} | -m {nuevo_nombre}: modificar el nombre de una rama | modificar el nombre estando en la rama
   - -d | -D {rama}: eliminar rama | eliminar rama no importa si tiene cambios por guardar
   - -a: mostrar todas las ramas incluidas las remotas
 
@@ -145,6 +153,31 @@ Un _rebase_ nos serviría para las siguientes situaciones: ordenar, corregir men
 - `git rebase {rama}`: a diferencia de merge, el rebase no crea un nuevo commit sino que "aplana" ambas ramas unificando los commits en una sola, esto hace que los commit que se trajeron sean eliminados y pasen a tener un nuevo hash en la rama a donde se aplicaron (se sobreescribe el historial). También se puede decir que sirve para actualizar el punto de separación de una rama.
 
   - -i HEAD~{cantidad_commits}: modo interactivo para tomar las cantidad de commits especificada despúes del HEAD (HEAD apunta al último commit)
+
     - s | squash: fusionar commits
     - r | reword: cambiar el mensaje de un commit
     - e | edit: editar los archivos de un commit o separarlos en varios (una vez finalizado se tiene que correr el comando git rebase --continue)
+
+### Repositorio Remoto
+
+Flujo de trabajo recomandado para Github: [https://blog.mergify.com/understanding-the-github-pull-request-workflow/](https://blog.mergify.com/understanding-the-github-pull-request-workflow/)
+
+- `git remote -v`: ver todas las conexiones a repositorios remotos
+
+  - add {alias_remoto} {url}: agregar una conexión remota a nuestro repositorio local
+  - rename {alias_remoto} {nuevo_alias}: modificar el alias
+  - remove {alias_remoto}: eliminar una conexión
+
+- `git push {alias_remoto} {rama_local}`: subir los cambios del repositorio local al remoto
+
+  - -u: establecer una conexión por defecto
+  - --all: sube todas las ramas y commits locales al remoto
+  - --tags: sube todas las etiquetas
+
+- `git pull {alias_remoto} {rama_remota}`: trae los combios del respositorio remoto al local, cuando se utiliza la bandera -u en el push no es necesario especificar el alias ni la rama del remoto
+
+  - --all: traer todas las ramas y sus commits del remoto al local
+
+- `git clone`: permite clonar (su rama principal y commits) un repositorio remoto
+
+- `git fetch`: permite **solo** actualizar las referencias (ramas y commits) entre el local y remoto, a menos que hagamos un git pull, el HEAD **no** apuntará al último commit que se haya creado en el remoto. Se puede considerar que es solo un comando informativo sobre los cambios y lo que podría ocurrir.
