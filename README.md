@@ -4,6 +4,12 @@ Simulador: [https://git-school.github.io/visualizing-git/](https://git-school.gi
 
 En GIT las carpetas de proyectos son conocidos como _repositorios_.
 
+Los 3 estados de GIT:
+
+1. **Working Directory (modified)**: es nuestro directorio de trabajo
+2. **Staging Area (staged)**: son los cambios que están próximos a hacer guardados en una confirmación (commit)
+3. **Local Repository (committed)**: son los cambios ya confirmados y guardados en la línea de tiempo
+
 _HEAD_ será un puntero que nos indicará en que punto del historial nos encontramos.
 
 Un _branch_ (rama) es una línea de tiempo de commits.
@@ -20,7 +26,7 @@ En un _merge_ (fusión) de ramas pueden ocurrir los siguientes panoramas:
 
 Las _tags_ (etiquetas) son una referencia a un commit específico (haciendo referencia a todo el estado del repositorio en ese momento del tiempo), utilizados principalmente para marcar versiones o release del código.
 
-Por defecto GIT no hace seguimientos de carpetas vacías, pero para indicarle que sí lo haga, dentro de carpeta se agrega el archivo _.gitkeep_.
+Por defecto GIT no hace seguimientos de carpetas vacías, pero para indicarle que sí lo haga, dentro de la carpeta se agrega el archivo _.gitkeep_.
 
 Para evitar que GIT haga seguimientos de archivos y/o carpetas, se especifican mediante un listado dentro de un archivo llamado _.gitignore_ en el root del repositorio.
 
@@ -59,6 +65,7 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
 - `git status`: conocer el estado actual del repositorio
 
   - -s: mostrar el estado de forma abreviada
+  - -b: mostrar la rama local y remota actual
 
 - `git log`: ver el historial de los commits (confirmaciones)
 
@@ -66,7 +73,7 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
   - --stat: muestra cuales fueron las líneas que cambiaron
   - --all: mostrar todos los commits y ramas
   - --graph: representación gráfica de la línea de tiempo de los commits
-  - --grep={consulta} -i: buscar en los mensajes de los commits sin importat mayúsculas o minúsculas
+  - --grep={consulta} -i: buscar en los mensajes de los commits sin importar mayúsculas o minúsculas
   - -p: mostrar las modificaciones de archivos en cada commit
   - -{limite}: indica el límite de commits para listar
   - -- {archivo(s)}: muestra los commit de un archivo
@@ -99,16 +106,18 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
   - -a {nombre} -m {mensaje}: permite agregar un mensaje descritivo al tag creado
   - -a {nombre} {hash_commit} -m {mensaje}: agrega el tag en el commit indicado
 
-- `git checkout -- {archivo} | -- .`: reconstruir el repositorio y/o archivo a como estaba en el último commit (solo a los que se les estaba haciendo seguimiento)
+- `git checkout {rama | hash_commit | tag}`: nos mueve a una rama, commit o tag
 
-  - {rama} | {hash_commit}: nos mueve a una rama o commit
+  - -- {archivo} | -- .: reconstruir el repositorio y/o archivo a como estaba en el último commit (solo a los que se les estaba haciendo seguimiento)
   - -b {rama}: crea una nueva rama y nos mueve a ella
+  - {hash_commit} {archivo}: recuperar un archivo tal cual como se encontraba en un determinado commit
 
 - `git reset {archivo} | reset .`: eliminar un archivo del Staging Area
 
   - --soft HEAD^ | {hash_commit} | {hash_commit}^{número_posición_commit}: guardar e incorporar cambios en el último commit (soft mantiene los cambios y ^ apunta al último commit antes del HEAD)
-  - --mixed {hash_commit}: vuelve a punto del tiempo sacando los archivos del stage y dejando listo para volver a guardar en un nuevo commit
-  - --hard {hash_commit}: se dejara al repositorio tal cual a como estaba en ese punto del tiempo y destruyendo todo lo demás
+  - --mixed {hash_commit}: vuelve al punto del tiempo sacando los archivos del stage y dejando listo para volver a guardar en un nuevo commit
+  - --hard {hash_commit}: se dejará al repositorio tal cual a como estaba en ese punto del tiempo destruyendo todo lo demás
+  - --hard HEAD^: deshacer el útlimo commit con todos sus cambios
 
 - `git stash`: guardar los cambios recientes de forma temporal (WIP: Working In Progress)
 
@@ -131,7 +140,14 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
 
   - --staged {archivo}: elimina los cambios que hayan pasado al stage
   - --staged --worktree {archivo}: elimina los cambios del stage y del working directory
-  - --source={hash_commit | tag} {archivo}: recupera el archivo desde el commit o tag indicado
+  - --source={hash_commit | tag} {archivo}: recupera el archivo tal cual se encontraba en un determinado commit o tag
+
+- `git grep {expresión | regex}`: buscar una expresión en todo nuestro código, indicando en que archivo se encuentra
+
+  - {expresión | regex} -- {ruta}: buscará coincidencias en la ruta indicada
+  - -i: buscar sin importar mayúsculas o minúsculas
+  - -w: buscar la expresión exacta
+  - -n: muestra el número de línea en donde se encuentra la búsqueda
 
 ### Ramas
 
@@ -149,8 +165,10 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
   - -c: crea una nueva rama y nos mueve a ella
   - --discard-changes {rama}: descarta todos los cambios al moverse de ramas
   - --orphan {rama}: crear una rama vacía, sin puntero e independiente (huerfana), especialmente para documentación
+  - -: volver el HEAD al último commit de la rama
+  - -d {hash_commit | tag}: moverse a un commit o tag
 
-- `git rebase {rama}`: a diferencia de merge, el rebase no crea un nuevo commit sino que "aplana" ambas ramas unificando los commits en una sola, esto hace que los commit que se trajeron sean eliminados y pasen a tener un nuevo hash en la rama a donde se aplicaron (se sobreescribe el historial). También se puede decir que sirve para actualizar el punto de separación de una rama.
+- `git rebase {rama}`: a diferencia de merge, el rebase no crea un nuevo commit sino que "aplana" ambas ramas unificando los commits en una sola, esto hace que los commit que se trajeron sean eliminados y pasen a tener un nuevo hash en la rama a donde se aplicaron (se sobreescribe el historial). También se puede decir que sirve para actualizar el punto de separación de una rama
 
   - -i HEAD~{cantidad_commits}: modo interactivo para tomar las cantidad de commits especificada despúes del HEAD (HEAD apunta al último commit)
 
@@ -164,20 +182,22 @@ Flujo de trabajo recomandado para Github: [https://blog.mergify.com/understandin
 
 - `git remote -v`: ver todas las conexiones a repositorios remotos
 
-  - add {alias_remoto} {url}: agregar una conexión remota a nuestro repositorio local
+  - add {alias_remoto} {url}: agregar una conexión remota a nuestro repositorio local (por convención, se utiliza el alias **upstream** para indicar un remoto del cual solo se traerá información)
   - rename {alias_remoto} {nuevo_alias}: modificar el alias
   - remove {alias_remoto}: eliminar una conexión
+  - prune {alias_remoto}: hace "limpieza" de las ramas inexistentes
 
 - `git push {alias_remoto} {rama_local}`: subir los cambios del repositorio local al remoto
 
   - -u: establecer una conexión por defecto
   - --all: sube todas las ramas y commits locales al remoto
   - --tags: sube todas las etiquetas
+  - {alias_remoto} :{rama_remota}: eliminar rama en caso de seguir existiendo en el remoto
 
-- `git pull {alias_remoto} {rama_remota}`: trae los combios del respositorio remoto al local, cuando se utiliza la bandera -u en el push no es necesario especificar el alias ni la rama del remoto
+- `git pull {alias_remoto} {rama_remota}`: trae los cambios del respositorio remoto al local, cuando se utiliza la bandera -u en el push no es necesario especificar el alias ni la rama del remoto
 
   - --all: traer todas las ramas y sus commits del remoto al local
 
-- `git clone`: permite clonar (su rama principal y commits) un repositorio remoto
+- `git clone`: permite clonar (su rama principal y commits) desde un repositorio remoto
 
-- `git fetch`: permite **solo** actualizar las referencias (ramas y commits) entre el local y remoto, a menos que hagamos un git pull, el HEAD **no** apuntará al último commit que se haya creado en el remoto. Se puede considerar que es solo un comando informativo sobre los cambios y lo que podría ocurrir.
+- `git fetch`: permite **solo** actualizar las referencias (ramas y commits) entre el local y remoto, a menos que hagamos un git pull, el HEAD **no** apuntará al último commit que se haya creado en el remoto. Se puede considerar que es solo un comando informativo sobre los cambios y lo que podría ocurrir
