@@ -96,6 +96,7 @@ Hacer un _pull request_ (Github) es cuando se "desprende" una rama de otra en al
 
   - --staged: comparar con los cambios agregados al stage
   - {commit} {commit}: hacer comparaciones de cambios entre commits
+  - {commit} {commit} {archivo}: ver diferencias de un archivo entre un commit y otro
 
 - `git reflog`: lista de todos los movimientos registrados del repositorio
 
